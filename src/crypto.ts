@@ -91,15 +91,6 @@ export async function open(
   return new TextDecoder().decode(plaintext);
 }
 
-/** Six digits both sides can show, so the sender can check the value that arrived is the one they sent. */
-export async function confirmCode(envelope: string): Promise<string> {
-  const digest = new Uint8Array(
-    await crypto.subtle.digest("SHA-256", new TextEncoder().encode(envelope)),
-  );
-  const n = new DataView(digest.buffer).getUint32(0) % 1_000_000;
-  return n.toString().padStart(6, "0");
-}
-
 function concat(...parts: Uint8Array[]): Uint8Array<ArrayBuffer> {
   const out = new Uint8Array(parts.reduce((n, p) => n + p.length, 0));
   let offset = 0;

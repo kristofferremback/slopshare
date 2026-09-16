@@ -8,7 +8,7 @@ const USAGE = `Usage:
       written to PATH on this machine.
   slopshare wait ID
       Blocks until the slot is filled, then writes the value to its path (0600).
-      Prints the path and a confirmation code, never the value.
+      Prints the path and size, never the value.
 
 Environment:
   SLOPSHARE_URL   agent API, e.g. http://homelab.your-tailnet.ts.net:20161.
@@ -36,7 +36,7 @@ try {
   } else if (command === "wait" && rest.length === 1) {
     const options = await defaultAgentOptions();
     const result = await waitForSlot(options, rest[0]!);
-    console.log(`wrote ${result.path} (${result.bytes} bytes, confirm ${result.confirm})`);
+    console.log(`wrote ${result.path} (${result.bytes} bytes)`);
   } else {
     console.log(USAGE);
     process.exit(command === "help" || command === "--help" ? 0 : 2);
