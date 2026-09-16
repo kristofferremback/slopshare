@@ -1,4 +1,4 @@
-import { confirmCode, seal } from "../crypto";
+import { seal } from "../crypto";
 
 type Status = "open" | "filled" | "delivered" | "expired";
 
@@ -75,12 +75,18 @@ async function load() {
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
-    if (!value.value) return;
+    // Phone keyboards add trailing spaces. No secret we paste depends on edge whitespace.
+    const text = value.value.trim();
+    if (!text) {
+      after.textContent = "Paste a value first.";
+      after.classList.add("warn");
+      return;
+    }
     send.disabled = true;
     after.textContent = "";
     after.classList.remove("warn");
     try {
-      const envelope = await seal(slot.publicKey, slot, value.value);
+      const envelope = await seal(slot.publicKey, slot, text);
       const sent = await fetch(`/api/slots/${encodeURIComponent(slot.id)}`, {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -91,21 +97,41 @@ async function load() {
         return problem(CLOSED[body.status]);
       }
       if (!sent.ok) throw new Error(`HTTP ${sent.status}`);
-
-      const code = await confirmCode(envelope);
-      sealed = true;
-      value.value = "";
-      value.readOnly = true;
-      $("code").textContent = code;
-      form.classList.add("sealed");
-      after.textContent = `Sent to ${slot.node}. The agent prints the same code.`;
-      $("code-spoken").textContent = `Code ${code}.`;
     } catch (err) {
       after.textContent = `Couldn't send (${(err as Error).message}). Try again.`;
       after.classList.add("warn");
       send.disabled = false;
+      return;
     }
+
+    sealed = true;
+    value.value = "";
+    value.readOnly = true;
+    $("stamp").textContent = "Sent";
+    form.classList.add("sealed");
+    after.textContent = `Waiting for ${slot.node} to pick it up.`;
+    watchDelivery(slot);
   });
+}
+
+async function watchDelivery(slot: SlotView) {
+  for (;;) {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    const response = await fetch(`/api/slots/${encodeURIComponent(slot.id)}`).catch(() => null);
+    if (!response?.ok) continue;
+    const { status } = (await response.json()) as SlotView;
+    if (status === "delivered") {
+      $("stamp").textContent = "Delivered";
+      form.classList.add("delivered");
+      after.textContent = `${slot.node} wrote it to the file.`;
+      return;
+    }
+    if (status === "expired") {
+      after.textContent = `${slot.node} didn't pick it up in time. ${NEW_LINK}`;
+      after.classList.add("warn");
+      return;
+    }
+  }
 }
 
 load().catch((err) => problem(`The slot didn't load (${(err as Error).message}). Reload to try again.`));

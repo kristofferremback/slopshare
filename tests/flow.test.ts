@@ -3,7 +3,7 @@ import { mkdtempSync, readFileSync, readdirSync, rmSync, statSync } from "node:f
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createSlot, waitForSlot, type AgentOptions } from "../src/agent";
-import { confirmCode, seal } from "../src/crypto";
+import { seal } from "../src/crypto";
 import { openDb } from "../src/db";
 import { startServers } from "../src/server";
 import { getSlot } from "../src/slots";
@@ -61,7 +61,7 @@ async function fillFromBrowser(url: string, value: string, { login = LOGIN, orig
     headers: { ...headers, origin, "content-type": "application/json" },
     body: JSON.stringify({ envelope }),
   });
-  return { response, envelope };
+  return { response };
 }
 
 describe("slot flow", () => {
@@ -70,10 +70,10 @@ describe("slot flow", () => {
     const slot = await createSlot(agent, { name: "openai key", path });
     const waiting = waitForSlot(agent, slot.id);
 
-    const { response, envelope } = await fillFromBrowser(slot.url, "sk-secret-value\n");
+    const { response } = await fillFromBrowser(slot.url, "sk-secret-value\n");
     expect(response.status).toBe(204);
 
-    expect(await waiting).toEqual({ path, bytes: 16, confirm: await confirmCode(envelope) });
+    expect(await waiting).toEqual({ path, bytes: 16 });
     expect(readFileSync(path, "utf8")).toBe("sk-secret-value\n");
     expect(statSync(path).mode & 0o777).toBe(0o600);
     expect(readdirSync(agent.keyDir)).toEqual([]);

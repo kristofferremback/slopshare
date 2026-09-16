@@ -3,8 +3,8 @@
 Paste a secret on any of your tailnet devices, and it lands in a file on the machine where an agent asked for it.
 
 1. An agent runs `slopshare create --name "openai key" --path ~/.config/foo/token` and sends you the link.
-2. You open the link, paste the value, and see a six-digit code.
-3. The agent runs `slopshare wait <id>`. It writes the file with mode 0600 and prints the same code.
+2. You open the link and paste the value. Spaces and newlines at either end are trimmed.
+3. The agent runs `slopshare wait <id>`. It writes the file with mode 0600, and the page shows that it was delivered.
 
 ## Security model
 
@@ -13,7 +13,6 @@ Paste a secret on any of your tailnet devices, and it lands in a file on the mac
 - Only one Tailscale login can open slot pages. `tailscale serve` sets `Tailscale-User-Login` and overwrites anything the client sends. Fills must come from the page's own origin, so another site open in the same browser can't post into a slot.
 - Only allowlisted nodes can create or collect slots. The agent API binds the server's tailnet address and checks each caller with the tailscaled LocalAPI whois. It refuses requests that carry an `Origin` header, so browsers can't use it. A slot can only be collected by the node that created it.
 - A slot takes one value. Open slots expire after 15 minutes by default. A filled value that never gets collected is wiped an hour after expiry, and a collected one is wiped right away. The row stays in SQLite as a record.
-- The page and the CLI both show a code derived from the ciphertext, so you can check that what arrived is what you sent.
 
 Caveats: the server serves the page's JavaScript, so a compromised server can read what gets typed into the page. Local processes on the server can reach the web port on 127.0.0.1 and forge the login header.
 

@@ -1,7 +1,7 @@
 import { chmod, mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
-import { confirmCode, generateSlotKeys, open } from "./crypto";
+import { generateSlotKeys, open } from "./crypto";
 
 export interface AgentOptions {
   baseUrl: string;
@@ -50,7 +50,7 @@ export async function createSlot(
 export async function waitForSlot(
   options: AgentOptions,
   id: string,
-): Promise<{ path: string; bytes: number; confirm: string }> {
+): Promise<{ path: string; bytes: number }> {
   const file = keyPath(options, id);
   const key = JSON.parse(await readFile(file, "utf8").catch(() => {
     throw new Error(`no key for slot ${id} in ${options.keyDir}`);
@@ -69,7 +69,7 @@ export async function waitForSlot(
       const delivered = await fetch(`${options.baseUrl}/api/slots/${id}/delivered`, { method: "POST" });
       if (!delivered.ok) throw new Error(`wrote ${key.path} but could not mark it delivered: ${await describe(delivered)}`);
       await rm(file, { force: true });
-      return { path: key.path, bytes: Buffer.byteLength(value), confirm: await confirmCode(slot.envelope) };
+      return { path: key.path, bytes: Buffer.byteLength(value) };
     }
     if (slot.status === "expired" || slot.status === "delivered") {
       await rm(file, { force: true });
