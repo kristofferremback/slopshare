@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="color-scheme" content="light dark" />
+    <title>slopshare</title>
+    <link rel="stylesheet" href="./page.css" />
+  </head>
+  <body>
+    <main>
+      <header class="meta" id="meta" hidden>
+        <span id="node"></span>
+        <time id="countdown" aria-label="Time left"></time>
+      </header>
+
+      <p id="problem" class="problem" role="alert" hidden></p>
+
+      <form id="form" hidden>
+        <label for="value" id="name" class="name"></label>
+        <p class="path" id="path"></p>
+        <div class="drop" id="drop">
+          <textarea
+            id="value"
+            required
+            rows="5"
+            autocomplete="off"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
+          ></textarea>
+          <div class="seal" id="seal" aria-hidden="true">
+            <output class="code" id="code"></output>
+          </div>
+        </div>
+        <button type="submit" id="send"></button>
+        <p class="after" role="status"><span class="spoken" id="code-spoken"></span><span id="after"></span></p>
+      </form>
+    </main>
+    <script type="module" src="./page.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,15 @@
+[Unit]
+Description=slopshare: paste secrets from tailnet devices into files on this machine
+After=network-online.target
+
+[Service]
+WorkingDirectory=%h/dev/slopshare
+ExecStart=%h/.bun/bin/bun index.ts
+EnvironmentFile=%h/.config/slopshare/server.env
+# The agent API binds the tailnet address, so a boot that beats tailscaled retries.
+Restart=always
+RestartSec=5
+UMask=0077
+
+[Install]
+WantedBy=default.target

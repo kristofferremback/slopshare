@@ -1,0 +1,227 @@
+/* Declared here instead of importing the package CSS: Bun's minifier unquotes
+   format("woff2-variations"), which Chrome rejects, dropping the face. */
+@font-face {
+  font-family: "Recursive Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 300 1000;
+  src: url("../../node_modules/@fontsource-variable/recursive/files/recursive-latin-mono-normal.woff2") format("woff2");
+}
+
+:root {
+  --paper: #e9edf2;
+  --ink: #172238;
+  --muted: #56627a;
+  --tint: #8fa3c4;
+  --seal: #3553a0;
+  --on-seal: #f4f6fa;
+  --warn: #a8412f;
+  --field: #f7f9fb;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #0f1522;
+    --ink: #d8dfea;
+    --muted: #8d99b0;
+    --tint: #2f4064;
+    --seal: #8ca6e8;
+    --on-seal: #0f1522;
+    --warn: #e0907f;
+    --field: #151c2b;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Recursive Variable", system-ui, sans-serif;
+  font-variation-settings: "MONO" 0;
+  font-size: 17px;
+  line-height: 1.5;
+  font-weight: 380;
+}
+
+main {
+  max-width: 34rem;
+  margin: 0 auto;
+  padding: max(1.5rem, env(safe-area-inset-top)) 16px 3rem;
+}
+
+.meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+  margin-bottom: 2.25rem;
+}
+
+.meta time {
+  font-variation-settings: "MONO" 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.meta time.low {
+  color: var(--warn);
+}
+
+.name {
+  display: block;
+  font-size: 2rem;
+  line-height: 1.15;
+  font-weight: 560;
+  letter-spacing: -0.015em;
+  overflow-wrap: anywhere;
+}
+
+.path {
+  margin: 0.5rem 0 1.5rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  font-variation-settings: "MONO" 1;
+  overflow-wrap: anywhere;
+}
+
+.drop {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+textarea {
+  display: block;
+  width: 100%;
+  min-height: 10rem;
+  margin: 0;
+  padding: 0.875rem 1rem;
+  border: 1.5px solid color-mix(in srgb, var(--ink) 35%, transparent);
+  border-radius: 12px;
+  background: var(--field);
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.45;
+  font-variation-settings: "MONO" 1;
+  resize: vertical;
+}
+
+textarea:focus-visible {
+  outline: none;
+  border-color: var(--seal);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--seal) 30%, transparent);
+}
+
+/* The inside of a security envelope: fine crossed lines that hide what is behind them. */
+.seal {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background-color: var(--paper);
+  background-image:
+    repeating-linear-gradient(45deg, var(--tint) 0 1px, transparent 1px 7px),
+    repeating-linear-gradient(-45deg, var(--tint) 0 1px, transparent 1px 11px);
+  border-radius: 12px;
+  clip-path: inset(0 100% 0 0);
+  visibility: hidden;
+}
+
+.code {
+  padding: 0.25rem 1rem;
+  background: var(--paper);
+  border-radius: 8px;
+  font-size: clamp(2.5rem, 13vw, 3.75rem);
+  font-weight: 620;
+  letter-spacing: 0.04em;
+  font-variation-settings: "MONO" 1;
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+}
+
+.sealed .seal {
+  visibility: visible;
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 520ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.sealed .code {
+  opacity: 1;
+  transition: opacity 240ms ease-out 480ms;
+}
+
+button {
+  margin-top: 1rem;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 1.25rem;
+  border: 0;
+  border-radius: 12px;
+  background: var(--seal);
+  color: var(--on-seal);
+  font: inherit;
+  font-weight: 600;
+  font-variation-settings: "MONO" 0;
+  cursor: pointer;
+}
+
+button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--seal) 45%, transparent);
+  outline-offset: 2px;
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.sealed button {
+  display: none;
+}
+
+.after {
+  margin: 1rem 0 0;
+  color: var(--muted);
+}
+
+.spoken {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.warn,
+.problem {
+  color: var(--warn);
+}
+
+.problem {
+  font-size: 1.25rem;
+  line-height: 1.35;
+  margin: 3rem 0 0;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sealed .seal,
+  .sealed .code {
+    transition: none;
+  }
+}
